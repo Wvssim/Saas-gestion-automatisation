@@ -1,0 +1,456 @@
+
+> sellflow-saas@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1735ms
+ ○ Compiling / ...
+ ✓ Compiled / in 3s (681 modules)
+ GET / 200 in 3120ms
+ ✓ Compiled /_not-found in 274ms (684 modules)
+ GET /auth/signin 404 in 379ms
+ ✓ Compiled in 103ms (349 modules)
+ ✓ Compiled in 102ms (349 modules)
+ ✓ Compiled in 173ms (684 modules)
+ ✓ Compiled in 123ms (349 modules)
+ ✓ Compiled in 133ms (684 modules)
+ ✓ Compiled /auth/signin in 389ms (680 modules)
+ GET /auth/signin 200 in 477ms
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 666ms (174 modules)
+ ✓ Compiled in 124ms (353 modules)
+ ✓ Compiled in 133ms (854 modules)
+ GET / 200 in 79ms
+ GET /auth/signin 200 in 87ms
+ ✓ Compiled /auth/signup in 385ms (686 modules)
+ GET /auth/signup 200 in 476ms
+ GET /dashboard 404 in 42ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 34ms
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 1723ms (667 modules)
+ GET /api/auth/session 200 in 2319ms
+ GET /api/auth/session 200 in 29ms
+ GET /signup 404 in 90ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 54ms
+ GET /api/auth/session 200 in 29ms
+ GET /api/auth/session 200 in 12ms
+ GET / 200 in 57ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 39ms
+ GET /api/auth/session 200 in 30ms
+ GET /api/auth/session 200 in 18ms
+ GET / 200 in 27ms
+ POST /api/auth/_log 200 in 70ms
+ POST /api/auth/_log 200 in 53ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 41ms
+ GET /api/auth/session 200 in 34ms
+ GET /api/auth/session 200 in 12ms
+ GET /signup 404 in 62ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 27ms
+ GET /api/auth/session 200 in 29ms
+ GET /api/auth/session 200 in 10ms
+ GET /signup 404 in 52ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 36ms
+ GET /api/auth/session 200 in 30ms
+ GET /api/auth/session 200 in 11ms
+ GET /api/auth/session 200 in 25ms
+ GET /api/auth/session 200 in 27ms
+ GET /signup 404 in 41ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 38ms
+ GET /api/auth/session 200 in 32ms
+ GET /api/auth/session 200 in 12ms
+ GET / 200 in 81ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 33ms
+ GET /api/auth/session 200 in 31ms
+ GET /api/auth/session 200 in 16ms
+ GET / 200 in 47ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 18ms
+ GET /api/auth/session 200 in 35ms
+ GET /api/auth/session 200 in 12ms
+ GET / 200 in 76ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 28ms
+ GET /api/auth/session 200 in 36ms
+ GET /api/auth/session 200 in 16ms
+ ✓ Compiled in 147ms (355 modules)
+ ✓ Compiled in 316ms (1182 modules)
+ ✓ Compiled /signup in 243ms (1016 modules)
+ GET /signup 200 in 325ms
+ GET /signup 200 in 57ms
+ GET /signup 200 in 57ms
+ GET /signup 200 in 68ms
+ GET /signup 200 in 44ms
+ GET /signup 200 in 45ms
+ ✓ Compiled in 366ms (1007 modules)
+ GET /signup 307 in 108ms
+ GET /signup 307 in 94ms
+ GET /signup 307 in 112ms
+ ✓ Compiled /auth/signup in 125ms (671 modules)
+ GET /auth/signup 200 in 216ms
+ GET /api/auth/session 200 in 74ms
+ GET /api/auth/providers 200 in 25ms
+ GET /api/auth/csrf 200 in 8ms
+ GET /api/auth/providers 200 in 22ms
+ GET /api/auth/csrf 200 in 7ms
+ GET /api/auth/session 200 in 22ms
+ GET /api/auth/providers 200 in 20ms
+ GET /api/auth/csrf 200 in 8ms
+ GET /api/auth/providers 200 in 17ms
+ GET /api/auth/csrf 200 in 8ms
+ GET /api/auth/providers 200 in 8ms
+ GET /api/auth/csrf 200 in 7ms
+ POST /api/auth/signin/google 200 in 864ms
+ POST /api/auth/signin/google 200 in 546ms
+ POST /api/auth/signin/google 200 in 6968ms
+ POST /api/auth/signin/google 200 in 4196ms
+ POST /api/auth/signin/google 200 in 400ms
+ GET /auth/signup 200 in 52ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 38ms
+ GET /api/auth/session 200 in 32ms
+ GET /api/auth/session 200 in 12ms
+ GET /auth/signup 200 in 50ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 32ms
+ GET /api/auth/session 200 in 32ms
+ GET /api/auth/session 200 in 30ms
+ ✓ Compiled /auth/signin in 277ms (675 modules)
+ GET /auth/signin 200 in 397ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 53ms
+ GET /api/auth/session 200 in 77ms
+ GET /api/auth/session 200 in 10ms
+ GET /api/auth/providers 200 in 23ms
+ GET /api/auth/csrf 200 in 8ms
+ GET /api/auth/providers 200 in 21ms
+ GET /api/auth/csrf 200 in 8ms
+ GET /api/auth/providers 200 in 16ms
+ GET /api/auth/csrf 200 in 7ms
+ POST /api/auth/signin/google 200 in 164ms
+ POST /api/auth/signin/google 200 in 1045ms
+ POST /api/auth/signin/google 200 in 3306ms
+ GET /auth/signin 200 in 62ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 22ms
+ GET /api/auth/session 200 in 29ms
+ GET /api/auth/session 200 in 11ms
+ GET /auth/signin 200 in 28ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 31ms
+ GET /api/auth/session 200 in 26ms
+ GET /api/auth/session 200 in 9ms
+ GET /api/auth/providers 200 in 17ms
+ GET /api/auth/csrf 200 in 7ms
+ POST /api/auth/signin/google 200 in 748ms
+ GET /api/auth/providers 200 in 17ms
+ GET /api/auth/csrf 200 in 7ms
+ POST /api/auth/signin/google 200 in 408ms
+ GET /api/auth/session 200 in 20ms
+ GET /api/auth/providers 200 in 21ms
+ GET /api/auth/csrf 200 in 7ms
+ GET /api/auth/providers 200 in 6ms
+ GET /api/auth/csrf 200 in 6ms
+ POST /api/auth/signin/google 200 in 293ms
+ GET /api/auth/providers 200 in 8ms
+ GET /api/auth/csrf 200 in 18ms
+ POST /api/auth/signin/google 200 in 58ms
+ GET /api/auth/providers 200 in 8ms
+ GET /api/auth/csrf 200 in 8ms
+ POST /api/auth/signin/google 200 in 58ms
+ GET /api/auth/providers 200 in 6ms
+ GET /api/auth/csrf 200 in 6ms
+ POST /api/auth/signin/google 200 in 55ms
+ POST /api/auth/signin/google 200 in 1120ms
+ GET / 200 in 50ms
+ GET /api/auth/session 200 in 24ms
+ GET /api/auth/session 200 in 8ms
+ GET /api/auth/providers 200 in 16ms
+ GET /api/auth/csrf 200 in 7ms
+ GET /api/auth/session 200 in 25ms
+ GET /api/auth/providers 200 in 16ms
+ GET /api/auth/csrf 200 in 6ms
+ POST /api/auth/signin/google 200 in 451ms
+ GET /api/auth/providers 200 in 19ms
+ GET /api/auth/csrf 200 in 7ms
+ GET /api/auth/providers 200 in 6ms
+ GET /api/auth/csrf 200 in 6ms
+ POST /api/auth/signin/google 200 in 7063ms
+ GET /api/auth/error?error=OAuthSignin 302 in 18ms
+ GET /api/auth/signin?error=OAuthSignin 302 in 7ms
+ GET /auth/signin?callbackUrl=http%3A%2F%2Flocalhost%3A3000%2Fdashboard&error=OAuthSignin 200 in 51ms
+ POST /api/auth/signin/google 200 in 1057ms
+ POST /api/auth/signin/google 200 in 1267ms
+ GET /api/auth/session 200 in 14ms
+ GET /api/auth/session 200 in 9ms
+ GET /dashboard 404 in 64ms
+ GET /api/auth/session 200 in 28ms
+ GET /api/auth/session 200 in 8ms
+ GET /dashboard 404 in 63ms
+ GET /api/auth/session 200 in 18ms
+ GET /api/auth/session 200 in 24ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 63ms
+ GET /api/auth/callback/google?state=nIf3PDYM1wZH0tsz1WUhch8r6NCbnBDFR2F26Y2I_1g&iss=https%3A%2F%2Faccounts.google.com&code=4%2F0AeoWuM-KrlbsPmkkz3YxddjZYfzmExQqPx0D1x5CH-Cl8OSJXX7KANEhrq8ZWhBMYPgj3g&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+openid+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&authuser=2&prompt=none 302 in 1979ms
+ GET /api/auth/error?error=OAuthCallback 302 in 19ms
+ GET /api/auth/signin?error=OAuthCallback 302 in 12ms
+ GET /auth/signin?callbackUrl=http%3A%2F%2Flocalhost%3A3000%2Fdashboard&error=OAuthCallback 200 in 56ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 26ms
+ GET /api/auth/session 200 in 20ms
+ GET /api/auth/session 200 in 8ms
+ GET /api/auth/session 200 in 8ms
+ GET /api/auth/session 200 in 28ms
+ GET /api/auth/session 200 in 22ms
+ GET /api/auth/session 200 in 22ms
+ GET /api/auth/providers 200 in 20ms
+ GET /api/auth/csrf 200 in 10ms
+ POST /api/auth/signin/google 200 in 163ms
+ GET /api/auth/session 200 in 24ms
+ GET /api/auth/callback/google?state=iFjr8y8oCqv9WUWIS1n2mnAljq5hPW6qrH8oB1eqMmw&iss=https%3A%2F%2Faccounts.google.com&code=4%2F0AeoWuM87gQVQuo0_wJhsovvQKRlsOBF9xhmgchtiHCrxAaPGII9XzqjzyclDLFqpSb0gJg&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile&authuser=2&prompt=none 302 in 994ms
+ GET /dashboard 404 in 58ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 20ms
+ GET /api/auth/session 200 in 24ms
+ GET /api/auth/session 200 in 8ms
+ GET /api/auth/session 200 in 30ms
+ GET /dashboard 404 in 46ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 29ms
+ GET /api/auth/session 200 in 29ms
+ GET /api/auth/session 200 in 9ms
+ ✓ Compiled in 506ms (698 modules)
+ ✓ Compiled /_not-found in 138ms (687 modules)
+ GET /dashboard 404 in 100ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 24ms
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 533ms (667 modules)
+ GET /api/auth/session 200 in 659ms
+ GET /api/auth/session 200 in 12ms
+ ✓ Compiled in 224ms (356 modules)
+ ✓ Compiled in 303ms (1009 modules)
+ GET /dashboard 404 in 74ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 25ms
+ GET /api/auth/session 200 in 53ms
+ GET /api/auth/session 200 in 12ms
+ ✓ Compiled in 126ms (356 modules)
+ GET /dashboard 404 in 66ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 32ms
+ GET /api/auth/session 200 in 36ms
+ GET /api/auth/session 200 in 15ms
+ GET /api/auth/session 200 in 28ms
+ GET /dashboard 404 in 26ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 35ms
+ GET /api/auth/session 200 in 27ms
+ GET /api/auth/session 200 in 31ms
+ GET /api/auth/callback/google?state=iFjr8y8oCqv9WUWIS1n2mnAljq5hPW6qrH8oB1eqMmw&iss=https%3A%2F%2Faccounts.google.com&code=4%2F0AeoWuM_DI7t5Cnp-8E5O2kuEfr-B4Av-_qiMUoxRuxBG0mG-P_HrwZvUJiaM-rYLj9igsw&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid&authuser=2&prompt=none 302 in 200ms
+ GET /api/auth/error?error=OAuthCallback 302 in 8ms
+ GET /api/auth/signin?error=OAuthCallback 302 in 7ms
+ GET /auth/signin?callbackUrl=http%3A%2F%2Flocalhost%3A3000%2Fdashboard&error=OAuthCallback 200 in 63ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 27ms
+ GET /api/auth/session 200 in 28ms
+ GET /api/auth/session 200 in 8ms
+ GET /api/auth/providers 200 in 21ms
+ GET /api/auth/csrf 200 in 7ms
+ POST /api/auth/signin/google 200 in 61ms
+ GET /api/auth/callback/google?state=wF_gZd5ybDR2vA9u8UgE4xQjeR4o2M1HsJFzyV5d45U&iss=https%3A%2F%2Faccounts.google.com&code=4%2F0AeoWuM95_VaOS3W85s3nTkQOQXBAFONySadFS3X5Uwx-nGlAll0m-_c4lGZ0axN4V5F2dw&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+openid&authuser=2&prompt=none 302 in 481ms
+ GET /dashboard 404 in 28ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 34ms
+ GET /api/auth/session 200 in 26ms
+ GET /api/auth/session 200 in 10ms
+ GET /api/auth/session 200 in 25ms
+ GET /api/auth/session 200 in 27ms
+ GET /api/auth/session 200 in 28ms
+ GET /api/auth/session 200 in 26ms
+ GET /api/auth/session 200 in 23ms
+ GET /dashboard 404 in 65ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 21ms
+ GET /api/auth/session 200 in 41ms
+ GET /api/auth/session 200 in 17ms
+ GET /dashboard 404 in 58ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 24ms
+ GET /dashboard 404 in 62ms
+ GET /api/auth/session 200 in 28ms
+ GET /api/auth/session 200 in 27ms
+ POST /api/auth/_log 200 in 17ms
+ POST /api/auth/_log 200 in 16ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 20ms
+ GET /api/auth/session 200 in 30ms
+ GET /api/auth/session 200 in 29ms
+ GET /api/auth/callback/google?state=9Yl82PIZKGHIbr9b07tmzVIXQnNxxqhuumU09x7auAY&iss=https%3A%2F%2Faccounts.google.com&code=4%2F0AeoWuM_rqN9-vHWljs0IDxWT1sfXvfUXyQunu0QqmRFUx_ucg0LeviDZKx29ui6NHr7dAQ&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid&authuser=3&prompt=consent 302 in 1039ms
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 1829ms (1236 modules)
+ GET /dashboard 404 in 1937ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 116ms
+ GET /dashboard 404 in 23ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 33ms
+ GET /api/auth/session 200 in 100ms
+ GET /api/auth/session 200 in 16ms
+ GET /dashboard 404 in 84ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 31ms
+ GET /api/auth/session 200 in 28ms
+ GET /api/auth/session 200 in 10ms
+ GET /api/auth/session 200 in 12ms
+ GET /api/auth/session 200 in 24ms
+ GET /api/auth/session 200 in 10ms
+ GET /api/auth/session 200 in 23ms
+ GET /api/auth/session 200 in 10ms
+ GET /api/auth/session 200 in 23ms
+ GET /api/auth/session 200 in 10ms
+ GET /api/auth/session 200 in 22ms
+ GET /api/auth/session 200 in 12ms
+ GET /api/auth/session 200 in 24ms
+ GET /api/auth/session 200 in 11ms
+ GET /api/auth/session 200 in 28ms
+ GET /api/auth/session 200 in 11ms
+ GET /dashboard 404 in 74ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 22ms
+ GET /api/auth/session 200 in 32ms
+ GET /api/auth/session 200 in 11ms
+ GET /api/auth/session 200 in 8ms
+ GET /api/auth/session 200 in 25ms
+ GET /api/auth/session 200 in 12ms
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 2.1s (1433 modules)
+ GET /dashboard 404 in 1ms
+ GET /dashboard 404 in 2ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 24ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 13ms
+ ✓ Compiled / in 503ms (938 modules)
+ GET / 200 in 863ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 23ms
+ GET /_next/static/css/app/layout.css?v=1777917255785 404 in 32ms
+ GET /_next/static/chunks/webpack.js?v=1777917255785 404 in 46ms
+ GET /_next/static/chunks/main-app.js?v=1777917255785 404 in 36ms
+ GET /_next/static/chunks/app-pages-internals.js 404 in 36ms
+ GET /_next/static/chunks/app/page.js 404 in 35ms
+ GET /_next/static/chunks/app/layout.js 404 in 35ms
+ ✓ Compiled /api/auth/[...nextauth] in 454ms (722 modules)
+ GET /api/auth/callback/google?state=MEz59Grx_7nFBGxusp1xqQ-0O-_bHHeF07QGVU6--Gg&iss=https%3A%2F%2Faccounts.google.com&code=4%2F0AeoWuM_I8r-W_5zzVSG5R2cTJx8gILqRYbOACwHakvDUC4Yv8BBexgCT6s53WXS-eFwhFw&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid&authuser=2&prompt=none 302 in 1142ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 109ms
+ GET /api/auth/callback/google?state=1blHIoiJVldtOEMDEeGHGuVC4RHUpS8GrtCC8NCYDiA&iss=https%3A%2F%2Faccounts.google.com&code=4%2F0AeoWuM8xOOqbpqrOo6fJ6l5Fg2fa8xCl8ltVLfQCR8jq7gyfojZ_WZ1WUXutzq9EWieRdg&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile&authuser=2&prompt=none 302 in 498ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 29ms
+ ✓ Compiled in 1907ms (1420 modules)
+ ✓ Compiled /dashboard in 429ms (721 modules)
+ GET /dashboard 200 in 666ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 37ms
+ GET /api/auth/session 200 in 99ms
+ GET /api/auth/session 200 in 13ms
+ GET /api/auth/session 200 in 40ms
+ ✓ Compiled in 2.3s (1444 modules)
+ ✓ Compiled in 2.9s (948 modules)
+ ✓ Compiled in 471ms (948 modules)
+ ✓ Compiled in 1103ms (948 modules)
+ ✓ Compiled in 370ms (550 modules)
+ ✓ Compiled in 278ms (550 modules)
+ ✓ Compiled in 270ms (550 modules)
+ ✓ Compiled in 177ms (550 modules)
+ ✓ Compiled in 189ms (550 modules)
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 573ms (937 modules)
+ GET /dashboard 404 in 99ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 35ms
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 1228ms (721 modules)
+ GET /api/auth/session 200 in 1400ms
+ GET /api/auth/session 200 in 19ms
+ GET /_next/static/chunks/app/dashboard/page.js 404 in 92ms
+ GET /_next/static/chunks/app/dashboard/layout.js 404 in 89ms
+ GET /dashboard 200 in 77ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 27ms
+ GET /_next/static/chunks/app/dashboard/page.js 404 in 20ms
+ GET /_next/static/chunks/app/dashboard/layout.js 404 in 23ms
+ GET /api/auth/callback/google?state=n61zgsG3IJFXLBHSO4tb4Ywo1R1jXFgdwRLJmIb9-WI&iss=https%3A%2F%2Faccounts.google.com&code=4%2F0AeoWuM-5XLK9s2LIvHyqcfdq4Diz2y7l5blfa_ed4N23wMW7n7ctZDynJUjl6aMdocH5bw&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+openid+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&authuser=2&prompt=none 302 in 593ms
+ GET /dashboard 200 in 40ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 34ms
+ GET /_next/static/chunks/app/dashboard/page.js 404 in 22ms
+ GET /_next/static/chunks/app/dashboard/layout.js 404 in 20ms
+ GET /dashboard 200 in 65ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 34ms
+ GET /_next/static/chunks/app/dashboard/page.js 404 in 24ms
+ GET /_next/static/chunks/app/dashboard/layout.js 404 in 21ms
+ GET /dashboard 200 in 71ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 36ms
+ GET /_next/static/chunks/app/dashboard/layout.js 404 in 34ms
+ GET /_next/static/chunks/app/dashboard/page.js 404 in 32ms
+ GET /dashboard 200 in 14ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 17ms
+ GET /_next/static/chunks/app/dashboard/page.js 404 in 25ms
+ GET /_next/static/chunks/app/dashboard/layout.js 404 in 23ms
+ GET /api/auth/callback/google?state=O-kGKHBl-RF1lMCqSuOpSIpuUYbtsiKt1TCTzgUg5uw&iss=https%3A%2F%2Faccounts.google.com&code=4%2F0AeoWuM8JwxIIGO2ok88d5pc1VwZswEQWHK9AXQUwYttbvEZSsVRwTQkFfNaZy0IZvmEyEw&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+openid&authuser=2&prompt=none 302 in 502ms
+ GET /dashboard 404 in 31ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 29ms
+ GET /api/auth/session 200 in 27ms
+ GET /api/auth/session 200 in 11ms
+ GET /api/auth/session 200 in 21ms
+ GET /auth/signin 404 in 253ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 15ms
+ GET /api/auth/session 200 in 26ms
+ GET /api/auth/session 200 in 9ms
+   Reload env: .env.local
+ ✓ Compiled in 770ms (1447 modules)
+ GET /api/auth/callback/google?state=rEHaY3QpXRzbvv4jbC_MkltYQoCEiTmtBC_4i3-epGU&iss=https%3A%2F%2Faccounts.google.com&code=4%2F0AeoWuM8Ee1f6-q2wJ7S0s4EyPezQdD5HhK5P-9wiv_EIKUWY2WCp9rAHLqxV7VTuUruIdw&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile&authuser=2&prompt=none 302 in 381ms
+ ✓ Compiled in 3s (1122 modules)
+ ✓ Compiled in 611ms (948 modules)
+ ✓ Compiled in 179ms (550 modules)
+ ✓ Compiled in 259ms (550 modules)
+ ✓ Compiled in 160ms (550 modules)
+ ✓ Compiled in 7.5s (1876 modules)
+ ✓ Compiled in 889ms (1890 modules)
+ ✓ Compiled in 302ms (1022 modules)
+ ✓ Compiled in 346ms (1022 modules)
+ ✓ Compiled in 2.1s (952 modules)
+ ✓ Compiled in 471ms (553 modules)
+ ✓ Compiled in 386ms (553 modules)
+ ✓ Compiled in 5.1s (1737 modules)
+ ✓ Compiled in 1661ms (1751 modules)
+ ✓ Compiled in 960ms (1751 modules)
+ ✓ Compiled in 467ms (952 modules)
+ ✓ Compiled in 924ms (1754 modules)
+ ✓ Compiled in 427ms (1754 modules)
+ ✓ Compiled in 969ms (1754 modules)
+ ✓ Compiled in 618ms (1754 modules)
+ ✓ Compiled in 342ms (1754 modules)
+ ✓ Compiled in 588ms (1754 modules)
+ ✓ Compiled in 313ms (1754 modules)
+ ✓ Compiled in 502ms (1754 modules)
+ ✓ Compiled in 596ms (1740 modules)
+ ✓ Compiled in 968ms (1754 modules)
+ ✓ Compiled in 583ms (1754 modules)
+ ✓ Compiled in 694ms (1754 modules)
+ ✓ Compiled in 1107ms (1754 modules)
+ ✓ Compiled in 614ms (1754 modules)
+ ✓ Compiled in 361ms (1754 modules)
+ ✓ Compiled in 365ms (953 modules)
+ ✓ Compiled in 218ms (953 modules)
+ ✓ Compiled in 606ms (1754 modules)
+ ✓ Compiled in 953ms (1754 modules)
+ ✓ Compiled in 1290ms (1754 modules)
+ ✓ Compiled in 1612ms (1754 modules)
+ ✓ Compiled in 1670ms (1754 modules)
+ ✓ Compiled in 1489ms (1754 modules)
+ ✓ Compiled in 223ms (953 modules)
+ ✓ Compiled in 238ms (953 modules)
+ ✓ Compiled in 180ms (953 modules)
+ ✓ Compiled in 276ms (953 modules)
+ ✓ Compiled in 1098ms (1754 modules)
+ GET / 500 in 496ms
+ ✓ Compiled in 2.7s (1754 modules)
+ ○ Compiling /_not-found ...
+ GET / 200 in 727ms
+ ✓ Compiled /_not-found in 938ms (1743 modules)
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 2.3s (1124 modules)
+ GET /api/auth/session 200 in 2441ms
+ GET /api/auth/session 200 in 23ms
+ GET /api/auth/error 200 in 27ms
+ GET /api/auth/error 200 in 22ms
+ GET /faq 404 in 72ms
+ GET /api/auth/session 200 in 38ms
+ GET /api/auth/session 200 in 9ms
+ GET / 200 in 159ms
+ GET /api/auth/session 200 in 24ms
+ GET /api/auth/session 200 in 14ms
+ GET /api/auth/session 200 in 25ms
+ GET /api/auth/session 404 in 17ms
+ POST /api/auth/_log 404 in 12ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 5.3s (1757 modules)
+ GET /_next/static/webpack/3fc7663f1e12c754.webpack.hot-update.json 404 in 3450ms
+ GET / 200 in 181ms
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 713ms (1124 modules)
+ GET /api/auth/session 200 in 1412ms
+ GET /api/auth/session 200 in 25ms
