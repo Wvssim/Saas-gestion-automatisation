@@ -20,21 +20,25 @@
 ## Prerequisites
 
 **Node.js 20+**
+
 ```bash
 node --version  # v20.0.0+
 ```
 
 **npm 10+**
+
 ```bash
 npm --version   # 10.0.0+
 ```
 
 **Git**
+
 ```bash
 git --version   # 2.40.0+
 ```
 
 **Accounts créés:**
+
 - GitHub (repo)
 - Supabase (database)
 - Vercel (frontend hosting)
@@ -62,6 +66,7 @@ npm install
 ```
 
 **Packages installés:**
+
 - next@14, react@19
 - @supabase/supabase-js
 - next-auth@5
@@ -98,6 +103,7 @@ git push -u origin main
 ### 2. Get Credentials
 
 In Supabase Dashboard:
+
 - **Project URL:** `Settings → API → Project URL`
 - **Anon Key:** `Settings → API → Anon Key`
 - **Service Key:** `Settings → API → Service Role Key`
