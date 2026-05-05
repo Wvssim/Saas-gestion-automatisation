@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 
 export const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -31,12 +32,12 @@ export const Footer: React.FC = () => {
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href="/pricing"
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Pricing
-                </a>
+                </Link>
               </li>
               <li>
                 <a

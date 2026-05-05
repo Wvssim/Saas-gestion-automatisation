@@ -14,6 +14,11 @@ model User {
   image String?
   plan  String  @default("starter") // starter, pro, enterprise
 
+  stripeCustomerId   String?   // Stripe customer ID for billing portal
+  stripeSubscriptionId String? // Stripe subscription ID
+  subscriptionStatus String?   // active, past_due, canceled, trialing
+  subscriptionEndsAt DateTime? // When subscription expires/cancels
+
   integrations    Integration[]
   automations     Automation[]
   automation_logs AutomationLog[]
