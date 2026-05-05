@@ -20,7 +20,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
             <KPICard
               key={i}
               kpi={{
-                id: `${i}`,
+                id: `skeleton-${i}`,
                 label: "",
                 value: "",
                 icon: "",

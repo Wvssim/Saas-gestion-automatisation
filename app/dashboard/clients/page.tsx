@@ -1,53 +1,48 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/hooks/useI18n";
-import { formatCurrency, formatNumber } from "@/lib/i18n/formatters";
+import { formatCurrency, formatNumber, getCurrencyForLocale } from "@/lib/i18n/formatters";
 
-const customers = [
-  {
-    name: "Nabil Amrani",
-    email: "nabil.amrani@mail.com",
-    phone: "+212 660 049 807",
-    orders: 12,
-    revenue: 4820,
-    status: "active",
-  },
-  {
-    name: "Sofia El Idrissi",
-    email: "sofia.idrissi@mail.com",
-    phone: "+212 662 708 193",
-    orders: 7,
-    revenue: 2380,
-    status: "vip",
-  },
-  {
-    name: "Mehdi Tazi",
-    email: "mehdi.tazi@mail.com",
-    phone: "+212 661 334 805",
-    orders: 3,
-    revenue: 980,
-    status: "new",
-  },
-  {
-    name: "Yassine Haddad",
-    email: "yassine.haddad@mail.com",
-    phone: "+212 663 921 040",
-    orders: 9,
-    revenue: 3140,
-    status: "active",
-  },
-];
+interface Customer {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  orders: number;
+  revenue: number;
+  status: "active" | "vip" | "new" | "inactive";
+}
 
 const statusBadge: Record<string, string> = {
   active: "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30",
   vip: "bg-violet-500/15 text-violet-300 border border-violet-500/30",
   new: "bg-sky-500/15 text-sky-300 border border-sky-500/30",
+  inactive: "bg-gray-500/15 text-gray-300 border border-gray-500/30",
 };
 
 export default function ClientsPage() {
   const { t, locale } = useI18n();
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const res = await fetch("/api/customers");
+        const json = await res.json();
+        setCustomers(json.data || []);
+      } catch (error) {
+        console.error("Failed to fetch customers:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCustomers();
+  }, []);
 
   const kpis = [
     { label: t("clients.kpi.total"), value: "1,482" },
@@ -136,39 +131,53 @@ export default function ClientsPage() {
               </tr>
             </thead>
             <tbody>
-              {customers.map((customer) => (
-                <tr
-                  key={customer.email}
-                  className="border-t border-border hover:bg-muted/40 transition-colors"
-                >
-                  <td className="px-4 py-4">
-                    <div className="font-medium text-foreground">
-                      {customer.name}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {customer.email}
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-muted-foreground">
-                    {customer.phone}
-                  </td>
-                  <td className="px-4 py-4 text-foreground">
-                    {formatNumber(locale, customer.orders)}
-                  </td>
-                  <td className="px-4 py-4 text-foreground">
-                    {formatCurrency(locale, customer.revenue, "MAD")}
-                  </td>
-                  <td className="px-4 py-4">
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${
-                        statusBadge[customer.status]
-                      }`}
-                    >
-                      {t(`clients.status.${customer.status}`)}
-                    </span>
+              {loading ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                    {t("common.loading")}...
                   </td>
                 </tr>
-              ))}
+              ) : customers.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                    {t("clients.noData")}
+                  </td>
+                </tr>
+              ) : (
+                customers.map((customer) => (
+                  <tr
+                    key={customer.id}
+                    className="border-t border-border hover:bg-muted/40 transition-colors"
+                  >
+                    <td className="px-4 py-4">
+                      <div className="font-medium text-foreground">
+                        {customer.name}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {customer.email || "N/A"}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-muted-foreground">
+                      {customer.phone || "N/A"}
+                    </td>
+                    <td className="px-4 py-4 text-foreground">
+                      {formatNumber(locale, customer.orders)}
+                    </td>
+                    <td className="px-4 py-4 text-foreground">
+                      {formatCurrency(locale, customer.revenue, getCurrencyForLocale(locale))}
+                    </td>
+                    <td className="px-4 py-4">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${
+                          statusBadge[customer.status]
+                        }`}
+                      >
+                        {t(`clients.status.${customer.status}`)}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

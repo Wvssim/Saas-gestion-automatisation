@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
 
     const hasNextPage = products.length > limit;
     const items = hasNextPage ? products.slice(0, limit) : products;
-    const endCursor = items.length > 0 ? items[items.length - 1].id : null;
+    const endCursor = items.length > 0 ? items[items.length - 1]?.id : null;
 
     const total = await prisma.product.count({ where });
 

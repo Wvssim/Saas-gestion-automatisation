@@ -133,7 +133,7 @@ export async function GET(request: NextRequest) {
 
     const hasMore = orders.length > limit;
     const items = hasMore ? orders.slice(0, limit) : orders;
-    const nextCursor = hasMore ? items[items.length - 1].id : null;
+    const nextCursor = hasMore && items.length > 0 ? items[items.length - 1]?.id : null;
 
     return NextResponse.json({
       orders: items,

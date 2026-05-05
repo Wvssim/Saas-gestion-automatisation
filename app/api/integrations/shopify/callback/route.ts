@@ -116,9 +116,10 @@ export async function GET(request: NextRequest) {
     }, 1000);
 
     // Rediriger avec succès
-    return NextResponse.redirect(
-      new URL('/integrations/shopify?connected=true', request.url)
-    );
+    const redirectUrl = new URL(process.env.NEXTAUTH_URL || 'http://localhost:3000');
+    redirectUrl.pathname = '/integrations/shopify';
+    redirectUrl.searchParams.set('connected', 'true');
+    return NextResponse.redirect(redirectUrl);
   } catch (error) {
     console.error('[Shopify] Callback error:', error);
     return redirectWithError(

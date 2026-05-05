@@ -2,6 +2,14 @@ import type { Locale } from "@/lib/i18n/locales";
 
 type RelativeUnit = "second" | "minute" | "hour" | "day" | "week" | "month" | "year";
 
+const LOCALE_CURRENCY_MAP: Record<Locale, string> = {
+  ar: "MAD",
+  fr: "EUR",
+  en: "USD",
+  es: "EUR",
+  hi: "INR",
+};
+
 export function formatNumber(locale: Locale, value: number) {
   return new Intl.NumberFormat(locale).format(value);
 }
@@ -13,10 +21,15 @@ export function formatPercent(locale: Locale, value: number) {
   }).format(value);
 }
 
-export function formatCurrency(locale: Locale, value: number, currency = "MAD") {
+export function getCurrencyForLocale(locale: Locale): string {
+  return LOCALE_CURRENCY_MAP[locale] || "USD";
+}
+
+export function formatCurrency(locale: Locale, value: number, currency?: string) {
+  const currencyCode = currency || getCurrencyForLocale(locale);
   return new Intl.NumberFormat(locale, {
     style: "currency",
-    currency,
+    currency: currencyCode,
     maximumFractionDigits: 2,
   }).format(value);
 }

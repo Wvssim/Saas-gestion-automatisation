@@ -29,7 +29,7 @@ export interface StockAlert {
   productName: string;
   currentStock: number;
   minStock: number;
-  severity: 'low' | 'critical';
+  severity: 'low' | 'high' | 'critical';
   sku?: string;
 }
 

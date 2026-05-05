@@ -139,7 +139,7 @@ export default function AutomationPage() {
             <tbody>
               {automations.map((automation) => (
                 <tr
-                  key={automation.name}
+                  key={automation.nameKey}
                   className="border-t border-border hover:bg-muted/40 transition-colors"
                 >
                   <td className="px-4 py-4">
@@ -148,7 +148,7 @@ export default function AutomationPage() {
                     </div>
                   </td>
                   <td className="px-4 py-4 text-muted-foreground">
-                    {t(automation.triggerKey, automation.triggerValue)}
+                    {t(automation.triggerKey, Object.fromEntries(Object.entries(automation.triggerValue).filter(([_, v]) => v !== undefined)) as Record<string, string | number>)}
                   </td>
                   <td className="px-4 py-4 text-muted-foreground">
                     {formatDateTime(locale, automation.lastRun)}

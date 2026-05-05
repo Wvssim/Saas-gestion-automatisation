@@ -5,20 +5,7 @@ import { prisma } from "@/lib/db/client";
 import { authOptions } from "@/lib/auth/config";
 import { topProductsQuerySchema } from "@/lib/analytics/schemas";
 import type { ApiResponse } from "@/types";
-import { TopProduct } from "@/types/dashboard";
-
-interface TopProduct {
-  id: string;
-  name: string;
-  sku?: string;
-  totalRevenue: number;
-  orderCount: number;
-  avgPrice: number;
-  revenue: number;
-  orders: number;
-  stock: number;
-  image: string;
-}
+import type { TopProduct } from "@/types/dashboard";
 
 /**
  * GET /api/analytics/products/top
@@ -87,6 +74,8 @@ export async function GET(
         id: string;
         name: string;
         sku: string | null;
+        stock: number;
+        imageUrl: string | null;
         total_revenue: number;
         order_count: number;
         avg_price: number;
@@ -96,13 +85,15 @@ export async function GET(
         p.id,
         p.name,
         p.sku,
+        p.stock,
+        p."imageUrl",
         COALESCE(SUM(CAST(o.revenue AS DECIMAL)), 0) as total_revenue,
         COUNT(o.id) as order_count,
         COALESCE(AVG(CAST(o.revenue AS DECIMAL)), 0) as avg_price
       FROM products p
       LEFT JOIN orders o ON p.id = o."productId"
       WHERE p."integrationId" = ANY(ARRAY[${integrationIds.join(",")}]::text[])
-      GROUP BY p.id, p.name, p.sku
+      GROUP BY p.id, p.name, p.sku, p.stock, p."imageUrl"
       ORDER BY total_revenue DESC
       LIMIT ${limit}
     `;
@@ -117,7 +108,7 @@ export async function GET(
       revenue: Number(product.total_revenue || 0),
       orders: Number(product.order_count || 0),
       stock: Number(product.stock || 0),
-      image: product.image || "/images/product-placeholder.jpg",
+      image: product.imageUrl || "/images/product-placeholder.jpg",
     }));
 
     return NextResponse.json(
@@ -137,55 +128,3 @@ export async function GET(
     );
   }
 }
-
-const getTopProducts = async (): Promise<TopProduct[]> => {
-  // In a real app, this would fetch and calculate data from a database
-  // For now, we return mock data that matches the expected structure
-  return [
-    {
-      id: "1",
-      name: "Premium Wireless Headphones",
-      revenue: 12450,
-      orders: 156,
-      stock: 45,
-      image: "/images/product-1.jpg",
-    },
-    {
-      id: "2",
-      name: "Smart Fitness Tracker",
-      revenue: 8230,
-      orders: 412,
-      stock: 128,
-      image: "/images/product-2.jpg",
-    },
-    {
-      id: "3",
-      name: "Organic Green Tea",
-      revenue: 6540,
-      orders: 820,
-      stock: 210,
-      image: "/images/product-3.jpg",
-    },
-    {
-      id: "4",
-      name: "Classic Leather Wallet",
-      revenue: 4320,
-      orders: 210,
-      stock: 8,
-      image: "/images/product-4.jpg",
-    },
-    {
-      id: "5",
-      name: "Bluetooth Speaker",
-      revenue: 3100,
-      orders: 150,
-      stock: 22,
-      image: "/images/product-5.jpg",
-    },
-  ];
-};
-
-export const GET = apiHandler(async () => {
-  const products = await getTopProducts();
-  return NextResponse.json({ data: products });
-});

@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import { apiHandler } from "@/lib/utils/apiHandler";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
 import { z } from "zod";
 import { prisma } from "@/lib/db/client";
 import { authOptions } from "@/lib/auth/config";
@@ -16,27 +16,6 @@ interface TrendDataPoint {
   orders: number;
 }
 
-interface TrendsData {
-  revenue: DateTrend[];
-  orders: DateTrend[];
-}
-
-const getTrendsData = async (): Promise<TrendsData> => {
-  // In a real app, this would fetch and calculate data from a database
-  // For now, we return mock data that matches the expected structure
-  const days = ["May 1", "May 2", "May 3", "May 4", "May 5", "May 6", "May 7"];
-  return {
-    revenue: days.map((day, i) => ({
-      date: day,
-      revenue: 2000 + i * 300 + Math.random() * 500,
-    })),
-    orders: days.map((day, i) => ({
-      date: day,
-      orders: 30 + i * 5 + Math.random() * 10,
-    })),
-  };
-};
-
 /**
  * GET /api/analytics/trends
  * Query: ?period=week|month|year
@@ -44,7 +23,7 @@ const getTrendsData = async (): Promise<TrendsData> => {
  */
 export async function GET(
   req: NextRequest,
-): Promise<NextResponse<ApiResponse<TrendsData>>> {
+): Promise<NextResponse<ApiResponse<TrendDataPoint[]>>> {
   try {
     const session = (await getServerSession(authOptions)) as any;
 
