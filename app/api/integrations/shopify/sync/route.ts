@@ -1,16 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth/config';
 import { prisma } from '@/lib/db/client';
-import { sync, testConnection } from '@/lib/integrations/shopify/sync';
+import { testConnection } from '@/lib/integrations/shopify/sync';
+import { productQueue, orderQueue } from '@/lib/queue';
 
 /**
  * POST /api/integrations/shopify/sync
- * Manually trigger Shopify sync
+ * Manually trigger Shopify sync via job queue
  * Body: { integrationId: "xxx" }
+ * Returns: job IDs for tracking
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = (await getServerSession(authOptions)) as any;
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -47,7 +50,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Tester connexion avant sync
+    // Tester connexion avant enqueue
     const canConnect = await testConnection(
       integration.storeUrl || '',
       integration.apiKey
@@ -60,23 +63,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Déclencher sync
-    const result = await sync({
-      id: integration.id,
-      storeUrl: integration.storeUrl || '',
-      apiKey: integration.apiKey,
-      refreshToken: integration.refreshToken || undefined,
-      accessTokenExpiresAt: integration.accessTokenExpiresAt,
-      last_sync: integration.last_sync || undefined,
+    // Enqueue jobs pour sync async
+    const productJob = await productQueue.add(
+      { integrationId },
+      {
+        attempts: 2,
+        backoff: { type: 'exponential', delay: 2000 },
+        priority: 10, // Manual sync has higher priority
+      }
+    );
+
+    const orderJob = await orderQueue.add(
+      { integrationId },
+      {
+        attempts: 2,
+        backoff: { type: 'exponential', delay: 2000 },
+        priority: 10,
+      }
+    );
+
+    console.log(`[Shopify Sync] Enqueued jobs for integration ${integrationId}:`, {
+      productJobId: productJob.id,
+      orderJobId: orderJob.id,
     });
 
     return NextResponse.json({
-      success: result.success,
-      productsCount: result.productsCount,
-      ordersCount: result.ordersCount,
-      errors: result.errors,
-      duration: result.duration,
-      lastSyncAt: new Date(),
+      success: true,
+      message: 'Sync jobs queued. Monitor status at /sync/status',
+      jobs: {
+        products: productJob.id,
+        orders: orderJob.id,
+      },
+      integrationId,
     });
   } catch (error) {
     console.error('[Shopify] Sync API error:', error);
@@ -92,11 +110,11 @@ export async function POST(request: NextRequest) {
 
 /**
  * GET /api/integrations/shopify/sync?integrationId=xxx
- * Get sync status
+ * Get sync status + queue stats
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = (await getServerSession(authOptions)) as any;
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -125,7 +143,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const stats = await prisma.$transaction([
+    const [productStats, orderStats] = await Promise.all([
+      productQueue.getJobCounts(),
+      orderQueue.getJobCounts(),
+    ]);
+
+    const dbStats = await prisma.$transaction([
       prisma.product.count({
         where: { integrationId },
       }),
@@ -135,15 +158,23 @@ export async function GET(request: NextRequest) {
     ]);
 
     return NextResponse.json({
-      integrationId,
-      storeUrl: integration.storeUrl,
-      type: integration.type,
-      enabled: integration.enabled,
-      lastSyncAt: integration.last_sync,
-      productsCount: stats[0],
-      ordersCount: stats[1],
-      createdAt: integration.created_at,
-      updatedAt: integration.updated_at,
+      integration: {
+        id: integrationId,
+        storeUrl: integration.storeUrl,
+        type: integration.type,
+        enabled: integration.enabled,
+        lastSyncAt: integration.last_sync,
+        createdAt: integration.created_at,
+        updatedAt: integration.updated_at,
+      },
+      data: {
+        productsCount: dbStats[0],
+        ordersCount: dbStats[1],
+      },
+      queue: {
+        products: productStats,
+        orders: orderStats,
+      },
     });
   } catch (error) {
     console.error('[Shopify] Status API error:', error);
