@@ -1,30 +1,33 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { prisma } from '@/lib/db/client';
-import { authOptions } from '@/lib/auth/config';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { prisma } from "@/lib/db/client";
+import { authOptions } from "@/lib/auth/config";
 import {
   calculateRevenue,
   calculateAOV,
   calculateConversionRate,
   calculateTrend,
   getPeriodDates,
-} from '@/lib/analytics/calculations';
-import { ApiError } from '@/lib/utils/errors';
-import type { ApiResponse } from '@/types';
-import type { DashboardMetrics } from '@/types';
+} from "@/lib/analytics/calculations";
+import { ApiError } from "@/lib/utils/errors";
+import type { ApiResponse } from "@/types";
+import type { DashboardMetrics } from "@/types";
+import type { DashboardKPI } from "@/types/dashboard";
 
 /**
  * GET /api/analytics/overview
  * Returns: Dashboard metrics (revenue, orders, AOV, conversion_rate, trends)
  */
-export async function GET(req: NextRequest): Promise<NextResponse<ApiResponse<DashboardMetrics>>> {
+export async function GET(
+  req: NextRequest,
+): Promise<NextResponse<ApiResponse<DashboardMetrics>>> {
   try {
-    const session = await getServerSession(authOptions) as any;
+    const session = (await getServerSession(authOptions)) as any;
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
       );
     }
 
@@ -51,16 +54,17 @@ export async function GET(req: NextRequest): Promise<NextResponse<ApiResponse<Da
         },
         {
           headers: {
-            'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+            "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
           },
-        }
+        },
       );
     }
 
     const integrationIds = integrations.map((i) => i.id);
 
     // Get current month data
-    const { startDate: currentStart, endDate: currentEnd } = getPeriodDates('month');
+    const { startDate: currentStart, endDate: currentEnd } =
+      getPeriodDates("month");
 
     const currentOrders = await prisma.order.findMany({
       where: {
@@ -109,23 +113,23 @@ export async function GET(req: NextRequest): Promise<NextResponse<ApiResponse<Da
       { success: true, data },
       {
         headers: {
-          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
         },
-      }
+      },
     );
   } catch (error) {
-    console.error('[Analytics Overview] Error:', error);
+    console.error("[Analytics Overview] Error:", error);
 
     if (error instanceof ApiError) {
       return NextResponse.json(
         { success: false, error: error.message },
-        { status: error.statusCode }
+        { status: error.statusCode },
       );
     }
 
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
+      { success: false, error: "Internal server error" },
+      { status: 500 },
     );
   }
 }

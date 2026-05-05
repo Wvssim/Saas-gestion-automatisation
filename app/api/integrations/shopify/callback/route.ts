@@ -46,16 +46,18 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Échanger code → access token
-    const accessToken = await exchangeCodeForToken(code, shop);
-    if (!accessToken) {
+    // Échanger code → tokens
+    const tokenData = await exchangeCodeForToken(code, shop);
+    if (!tokenData) {
       return redirectWithError(
         'Failed to authenticate with Shopify',
         '/integrations/shopify'
       );
     }
 
-    // Tester connexion
+    const { accessToken, refreshToken, accessTokenExpiresAt } = tokenData;
+
+    // Tester connexion avant stockage
     const connected = await testConnection(shop, accessToken);
     if (!connected) {
       return redirectWithError(
@@ -78,10 +80,14 @@ export async function GET(request: NextRequest) {
         type: 'shopify',
         storeUrl: shop,
         apiKey: accessToken, // Encrypté via Prisma @db.Encrypted
+        refreshToken: refreshToken || null,
+        accessTokenExpiresAt: accessTokenExpiresAt || null,
         enabled: true,
       },
       update: {
         apiKey: accessToken,
+        refreshToken: refreshToken || null,
+        accessTokenExpiresAt: accessTokenExpiresAt || null,
         enabled: true,
         updated_at: new Date(),
       },
@@ -101,6 +107,8 @@ export async function GET(request: NextRequest) {
           id: integration.id,
           storeUrl: shop,
           apiKey: accessToken,
+          refreshToken: refreshToken || undefined,
+          accessTokenExpiresAt: accessTokenExpiresAt || undefined,
         });
       } catch (err) {
         console.error('[Shopify] Initial sync failed:', err);
@@ -164,7 +172,11 @@ async function verifyOAuthState(
 async function exchangeCodeForToken(
   code: string,
   shop: string
-): Promise<string | null> {
+): Promise<{
+  accessToken: string;
+  refreshToken?: string;
+  accessTokenExpiresAt?: Date;
+} | null> {
   try {
     const apiSecret = process.env.SHOPIFY_API_SECRET;
     if (!apiSecret) {
@@ -201,13 +213,25 @@ async function exchangeCodeForToken(
     }
 
     const data = await response.json();
-    const accessToken = data.access_token;
+    const accessToken: string | undefined = data.access_token;
+    const refreshToken: string | undefined = data.refresh_token;
+    const expiresIn: number | undefined = data.expires_in;
 
     if (!accessToken) {
       throw new Error('No access token in response');
     }
 
-    return accessToken;
+    // Buffer 60s pour rafraîchir avant expiration réelle
+    const TOKEN_BUFFER_SEC = 60;
+    const accessTokenExpiresAt = expiresIn
+      ? new Date(Date.now() + (expiresIn - TOKEN_BUFFER_SEC) * 1000)
+      : undefined;
+
+    return {
+      accessToken,
+      refreshToken,
+      accessTokenExpiresAt,
+    };
   } catch (err) {
     console.error('[Shopify] Token exchange error:', err);
     return null;

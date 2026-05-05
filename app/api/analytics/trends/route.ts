@@ -1,11 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { z } from 'zod';
-import { prisma } from '@/lib/db/client';
-import { authOptions } from '@/lib/auth/config';
-import { calculateTrendDataPoints, getPeriodDates } from '@/lib/analytics/calculations';
-import { trendsQuerySchema } from '@/lib/analytics/schemas';
-import type { ApiResponse } from '@/types';
+import { NextResponse } from "next/server";
+import { apiHandler } from "@/lib/utils/apiHandler";
+import { z } from "zod";
+import { prisma } from "@/lib/db/client";
+import { authOptions } from "@/lib/auth/config";
+import {
+  calculateTrendDataPoints,
+  getPeriodDates,
+} from "@/lib/analytics/calculations";
+import { trendsQuerySchema } from "@/lib/analytics/schemas";
+import type { ApiResponse } from "@/types";
 
 interface TrendDataPoint {
   date: string;
@@ -13,25 +16,51 @@ interface TrendDataPoint {
   orders: number;
 }
 
+interface TrendsData {
+  revenue: DateTrend[];
+  orders: DateTrend[];
+}
+
+const getTrendsData = async (): Promise<TrendsData> => {
+  // In a real app, this would fetch and calculate data from a database
+  // For now, we return mock data that matches the expected structure
+  const days = ["May 1", "May 2", "May 3", "May 4", "May 5", "May 6", "May 7"];
+  return {
+    revenue: days.map((day, i) => ({
+      date: day,
+      revenue: 2000 + i * 300 + Math.random() * 500,
+    })),
+    orders: days.map((day, i) => ({
+      date: day,
+      orders: 30 + i * 5 + Math.random() * 10,
+    })),
+  };
+};
+
 /**
  * GET /api/analytics/trends
  * Query: ?period=week|month|year
  * Returns: Data points pour chart (date, revenue, orders)
  */
-export async function GET(req: NextRequest): Promise<NextResponse<ApiResponse<TrendDataPoint[]>>> {
+export async function GET(
+  req: NextRequest,
+): Promise<NextResponse<ApiResponse<TrendsData>>> {
   try {
-    const session = await getServerSession(authOptions) as any;
+    const session = (await getServerSession(authOptions)) as any;
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
       );
     }
 
     // Parse query params
     const searchParams = req.nextUrl.searchParams;
-    const period = (searchParams.get('period') || 'month') as 'week' | 'month' | 'year';
+    const period = (searchParams.get("period") || "month") as
+      | "week"
+      | "month"
+      | "year";
 
     // Validate
     try {
@@ -39,8 +68,8 @@ export async function GET(req: NextRequest): Promise<NextResponse<ApiResponse<Tr
     } catch (error) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(
-          { success: false, error: 'Invalid period parameter' },
-          { status: 400 }
+          { success: false, error: "Invalid period parameter" },
+          { status: 400 },
         );
       }
       throw error;
@@ -59,9 +88,9 @@ export async function GET(req: NextRequest): Promise<NextResponse<ApiResponse<Tr
         { success: true, data: [] },
         {
           headers: {
-            'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+            "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
           },
-        }
+        },
       );
     }
 
@@ -77,7 +106,7 @@ export async function GET(req: NextRequest): Promise<NextResponse<ApiResponse<Tr
           lte: endDate,
         },
       },
-      orderBy: { order_date: 'asc' },
+      orderBy: { order_date: "asc" },
     });
 
     // Calculate trend data points
@@ -87,16 +116,16 @@ export async function GET(req: NextRequest): Promise<NextResponse<ApiResponse<Tr
       { success: true, data: trendData },
       {
         headers: {
-          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
         },
-      }
+      },
     );
   } catch (error) {
-    console.error('[Analytics Trends] Error:', error);
+    console.error("[Analytics Trends] Error:", error);
 
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
+      { success: false, error: "Internal server error" },
+      { status: 500 },
     );
   }
 }

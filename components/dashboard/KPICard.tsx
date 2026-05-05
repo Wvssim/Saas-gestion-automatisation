@@ -1,102 +1,132 @@
-"use client";
-
-import React from "react";
-import { DashboardKPI } from "@/types/dashboard";
-import { Card, CardBody } from "@/components/ui/card";
+import {
+  DollarSign,
+  ShoppingCart,
+  TrendingUp,
+  Target,
+  Clock,
+  Star,
+  ArrowUp,
+  ArrowDown,
+  ArrowRight,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface KPICardProps {
-  kpi: DashboardKPI;
+  kpi: {
+    label: string;
+    value: string;
+    icon: string;
+    trend: number;
+    trendLabel: string;
+    color: string;
+  };
   isLoading?: boolean;
 }
 
-const colorClasses = {
-  emerald: "text-emerald-600 bg-emerald-50",
-  blue: "text-blue-600 bg-blue-50",
-  purple: "text-purple-600 bg-purple-50",
-  orange: "text-orange-600 bg-orange-50",
-  amber: "text-amber-600 bg-amber-50",
-  rose: "text-rose-600 bg-rose-50",
+const iconMap: Record<string, React.ReactNode> = {
+  DollarSign: <DollarSign className="h-6 w-6" />,
+  ShoppingCart: <ShoppingCart className="h-6 w-6" />,
+  TrendingUp: <TrendingUp className="h-6 w-6" />,
+  Target: <Target className="h-6 w-6" />,
+  Clock: <Clock className="h-6 w-6" />,
+  Star: <Star className="h-6 w-6" />,
 };
 
-const trendColorClasses = {
-  positive: "text-emerald-600",
-  negative: "text-red-600",
-  neutral: "text-gray-600",
+const colorVariants = {
+  emerald: {
+    text: "text-emerald-500",
+    bg: "bg-emerald-500/10",
+    border: "border-emerald-500/20",
+  },
+  blue: {
+    text: "text-blue-500",
+    bg: "bg-blue-500/10",
+    border: "border-blue-500/20",
+  },
+  purple: {
+    text: "text-purple-500",
+    bg: "bg-purple-500/10",
+    border: "border-purple-500/20",
+  },
+  orange: {
+    text: "text-orange-500",
+    bg: "bg-orange-500/10",
+    border: "border-orange-500/20",
+  },
+  amber: {
+    text: "text-amber-500",
+    bg: "bg-amber-500/10",
+    border: "border-amber-500/20",
+  },
+  rose: {
+    text: "text-rose-500",
+    bg: "bg-rose-500/10",
+    border: "border-rose-500/20",
+  },
 };
 
-const getIconComponent = (iconName: string) => {
-  const iconMap: Record<string, React.ReactNode> = {
-    DollarSign: "💵",
-    ShoppingCart: "🛒",
-    TrendingUp: "📈",
-    Target: "🎯",
-    Clock: "⏰",
-    Star: "⭐",
-  };
-  return iconMap[iconName] || "📊";
-};
-
-const getTrendColor = (trend: number): keyof typeof trendColorClasses => {
-  if (trend > 0) return "positive";
-  if (trend < 0) return "negative";
-  return "neutral";
+const trendVariants = {
+  positive: {
+    text: "text-emerald-500",
+    icon: <ArrowUp className="h-4 w-4" />,
+  },
+  negative: {
+    text: "text-rose-500",
+    icon: <ArrowDown className="h-4 w-4" />,
+  },
+  neutral: {
+    text: "text-muted-foreground",
+    icon: <ArrowRight className="h-4 w-4" />,
+  },
 };
 
 export const KPICard: React.FC<KPICardProps> = ({ kpi, isLoading = false }) => {
-  const colorClass =
-    colorClasses[kpi.color as keyof typeof colorClasses] || colorClasses.blue;
-  const trendColor = getTrendColor(kpi.trend);
-  const trendIcon = kpi.trend > 0 ? "↑" : kpi.trend < 0 ? "↓" : "→";
-
   if (isLoading) {
     return (
-      <Card className="hover:shadow-md transition-shadow">
-        <CardBody>
-          <div className="space-y-3">
-            <div className="h-4 bg-muted rounded w-24 animate-pulse" />
-            <div className="h-8 bg-muted rounded w-32 animate-pulse" />
-            <div className="h-4 bg-muted rounded w-20 animate-pulse" />
-          </div>
-        </CardBody>
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-5 w-24" />
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-4 w-28" />
+        </CardContent>
       </Card>
     );
   }
 
+  const color =
+    colorVariants[kpi.color as keyof typeof colorVariants] ||
+    colorVariants.blue;
+  const trendDirection =
+    kpi.trend > 0 ? "positive" : kpi.trend < 0 ? "negative" : "neutral";
+  const trend = trendVariants[trendDirection];
+
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardBody className="space-y-2">
-        {/* Icon & Label */}
-        <div className="flex items-center justify-between">
-          <span className={`text-sm font-medium text-muted-foreground`}>
-            {kpi.label}
-          </span>
-          <div className={`text-2xl p-2 rounded-lg ${colorClass}`}>
-            {getIconComponent(kpi.icon)}
-          </div>
+    <Card
+      className={`transition-all hover:shadow-lg hover:-translate-y-1 border-l-4 ${color.border}`}
+    >
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium text-muted-foreground">
+          {kpi.label}
+        </CardTitle>
+        <div className={`p-2 rounded-full ${color.bg} ${color.text}`}>
+          {iconMap[kpi.icon] || <TrendingUp className="h-6 w-6" />}
         </div>
-
-        {/* Value */}
-        <div className="mt-2">
-          <h3 className="text-2xl font-bold text-foreground">{kpi.value}</h3>
-        </div>
-
-        {/* Trend */}
-        <div className="flex items-center gap-2 mt-3">
+      </CardHeader>
+      <CardContent>
+        <div className="text-3xl font-bold text-foreground">{kpi.value}</div>
+        <div className="flex items-center gap-1 text-xs mt-1">
           <span
-            className={`text-sm font-semibold ${trendColorClasses[trendColor]}`}
+            className={`flex items-center gap-1 font-semibold ${trend.text}`}
           >
-            {trendIcon} {Math.abs(kpi.trend)}%
+            {trend.icon}
+            {Math.abs(kpi.trend)}%
           </span>
-          <span className="text-xs text-muted-foreground">
-            {kpi.trendLabel}
-          </span>
+          <span className="text-muted-foreground">{kpi.trendLabel}</span>
         </div>
-
-        {/* Bottom accent line */}
-        <div
-          className={`mt-4 h-1 rounded-full bg-gradient-to-r from-${kpi.color}-500 to-${kpi.color}-600`}
-        />
-      </CardBody>
+      </CardContent>
     </Card>
   );
 };

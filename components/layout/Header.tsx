@@ -2,6 +2,9 @@
 
 import React from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useI18n } from "@/hooks/useI18n";
+import { locales, type Locale } from "@/lib/i18n/locales";
+import { Bell, UserCircle } from "lucide-react";
 
 interface HeaderProps {
   title?: string;
@@ -11,11 +14,10 @@ interface HeaderProps {
   }>;
 }
 
-export const Header: React.FC<HeaderProps> = ({
-  title = "Dashboard",
-  breadcrumbs,
-}) => {
+export const Header: React.FC<HeaderProps> = ({ title, breadcrumbs }) => {
   const { user } = useAuth();
+  const { t, locale, setLocale, localeLabels } = useI18n();
+  const resolvedTitle = title || t("dashboard.title");
 
   return (
     <header className="sticky top-0 z-30 bg-card border-b border-border shadow-sm">
@@ -48,17 +50,36 @@ export const Header: React.FC<HeaderProps> = ({
               ))}
             </nav>
           )}
-          <h1 className="text-2xl font-bold text-foreground">{title}</h1>
+          <h1 className="text-2xl font-bold text-foreground">
+            {resolvedTitle}
+          </h1>
         </div>
 
         {/* Right: User Info */}
         <div className="flex items-center gap-4 ml-4">
+          <div className="hidden md:block">
+            <label className="sr-only" htmlFor="locale-select">
+              {t("settings.language")}
+            </label>
+            <select
+              id="locale-select"
+              className="h-9 rounded-lg border border-border bg-background px-2 text-sm text-foreground"
+              value={locale}
+              onChange={(event) => setLocale(event.target.value as Locale)}
+            >
+              {locales.map((lang) => (
+                <option key={lang} value={lang}>
+                  {localeLabels[lang]}
+                </option>
+              ))}
+            </select>
+          </div>
           {/* Notifications (placeholder) */}
           <button
             className="relative p-2 text-muted-foreground hover:bg-accent rounded-lg transition-colors"
             aria-label="Notifications"
           >
-            🔔
+            <Bell className="h-5 w-5" />
             <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full" />
           </button>
 
@@ -76,7 +97,15 @@ export const Header: React.FC<HeaderProps> = ({
               className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary text-primary-foreground font-bold flex items-center justify-center hover:shadow-md transition-shadow"
               aria-label="User menu"
             >
-              {user?.name?.charAt(0)?.toUpperCase() || "U"}
+              {user?.image ? (
+                <img
+                  src={user.image}
+                  alt="User"
+                  className="rounded-full h-full w-full object-cover"
+                />
+              ) : (
+                <UserCircle className="h-6 w-6" />
+              )}
             </button>
           </div>
         </div>

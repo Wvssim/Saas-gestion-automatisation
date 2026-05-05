@@ -4,55 +4,74 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { useI18n } from "@/hooks/useI18n";
+import {
+  LayoutDashboard,
+  BarChart2,
+  Package,
+  ShoppingCart,
+  Zap,
+  Link2,
+  Settings,
+  LogOut,
+  Menu,
+  X,
+  Users,
+} from "lucide-react";
 
 interface NavItem {
   href: string;
-  label: string;
-  icon: string;
-  activePrefix?: string;
+  labelKey: string;
+  icon: React.ReactNode;
 }
 
 const navItems: NavItem[] = [
   {
     href: "/dashboard",
-    label: "Dashboard",
-    icon: "📊",
+    labelKey: "nav.dashboard",
+    icon: <LayoutDashboard className="h-5 w-5" />,
   },
   {
     href: "/dashboard/analytics",
-    label: "Analytics",
-    icon: "📈",
+    labelKey: "nav.analytics",
+    icon: <BarChart2 className="h-5 w-5" />,
   },
   {
     href: "/dashboard/products",
-    label: "Products",
-    icon: "📦",
+    labelKey: "nav.products",
+    icon: <Package className="h-5 w-5" />,
   },
   {
     href: "/dashboard/orders",
-    label: "Orders",
-    icon: "🛒",
+    labelKey: "nav.orders",
+    icon: <ShoppingCart className="h-5 w-5" />,
+  },
+  {
+    href: "/dashboard/clients",
+    labelKey: "nav.clients",
+    icon: <Users className="h-5 w-5" />,
   },
   {
     href: "/dashboard/automation",
-    label: "Automation",
-    icon: "⚙️",
+    labelKey: "nav.automation",
+    icon: <Zap className="h-5 w-5" />,
   },
   {
     href: "/dashboard/integrations",
-    label: "Integrations",
-    icon: "🔗",
+    labelKey: "nav.integrations",
+    icon: <Link2 className="h-5 w-5" />,
   },
   {
     href: "/dashboard/settings",
-    label: "Settings",
-    icon: "⚡",
+    labelKey: "nav.settings",
+    icon: <Settings className="h-5 w-5" />,
   },
 ];
 
 export const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const { t } = useI18n();
 
   const isActive = (href: string) => {
     if (href === "/dashboard") {
@@ -63,7 +82,7 @@ export const Sidebar: React.FC = () => {
 
   const handleLogout = async () => {
     setIsOpen(false);
-    await signOut({ callbackUrl: "/auth/signin" });
+    await signOut({ callbackUrl: "/" });
   };
 
   return (
@@ -71,10 +90,10 @@ export const Sidebar: React.FC = () => {
       {/* Mobile toggle */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg border border-gray-200 shadow-md"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-card rounded-lg border border-border shadow-md"
         aria-label="Toggle navigation"
       >
-        {isOpen ? "✕" : "☰"}
+        {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
 
       {/* Overlay */}
@@ -117,8 +136,8 @@ export const Sidebar: React.FC = () => {
                   }`}
                   aria-current={isActive(item.href) ? "page" : undefined}
                 >
-                  <span className="text-xl">{item.icon}</span>
-                  <span>{item.label}</span>
+                  {item.icon}
+                  <span>{t(item.labelKey)}</span>
                 </Link>
               </li>
             ))}
@@ -128,11 +147,11 @@ export const Sidebar: React.FC = () => {
         {/* Footer */}
         <div className="border-t border-border p-4">
           <button
-            className="w-full px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-accent rounded-lg transition-colors flex items-center gap-2"
+            className="w-full px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-accent rounded-lg transition-colors flex items-center gap-3"
             onClick={handleLogout}
           >
-            <span>🚪</span>
-            Logout
+            <LogOut className="h-5 w-5" />
+            {t("nav.logout")}
           </button>
         </div>
       </aside>

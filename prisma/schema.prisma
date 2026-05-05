@@ -8,88 +8,150 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  image     String?
-  plan      String   @default("starter") // starter, pro, enterprise
+  id    String  @id @default(cuid())
+  email String  @unique
+  name  String?
+  image String?
+  plan  String  @default("starter") // starter, pro, enterprise
 
-  integrations  Integration[]
-  automations   Automation[]
+  integrations    Integration[]
+  automations     Automation[]
   automation_logs AutomationLog[]
 
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@map("users")
 }
 
 model Integration {
-  id          String   @id @default(cuid())
-  userId      String
-  type        String   // shopify, amazon, ebay
-  apiKey      String   @db.Text // Encrypted via Prisma encryption
-  storeUrl    String?
-  enabled     Boolean  @default(true)
+  id                   String    @id @default(cuid())
+  userId               String
+  type                 String // shopify, amazon, ebay
+  apiKey               String    @db.Text // Encrypted via Prisma encryption
+  refreshToken         String?   @db.Text
+  accessTokenExpiresAt DateTime?
+  storeUrl             String?
+  enabled              Boolean   @default(true)
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   products    Product[]
   orders      Order[]
   automations Automation[]
+  customers   Customer[]
+  webhooks    Webhook[]
 
-  last_sync   DateTime?
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  last_sync  DateTime?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
 
   @@unique([userId, type, storeUrl])
   @@map("integrations")
 }
 
 model Product {
-  id              String   @id @default(cuid())
-  integrationId   String
-  externalId      String
-  name            String
-  sku             String?
-  description     String?
-  price           Decimal
-  stock           Int
-  imageUrl        String?
+  id            String  @id @default(cuid())
+  integrationId String
+  externalId    String
+  name          String
+  sku           String?
+  description   String?
+  price         Decimal
+  stock         Int
+  minStock      Int     @default(10)
+  imageUrl      String?
+  status        String  @default("active") // active, draft, archived
 
-  integration     Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
-  orders          Order[]
+  integration   Integration      @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  orders        Order[]
+  line_items    LineItem[]
+  price_history PriceHistory[]
+  variants      ProductVariant[]
+  images        ProductImage[]
 
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
+  lastUpdatedAt DateTime?
+  deletedAt     DateTime?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
 
   @@unique([integrationId, externalId])
+  @@index([integrationId, status])
+  @@index([integrationId, deletedAt])
   @@map("products")
 }
 
+model ProductVariant {
+  id         String  @id @default(cuid())
+  productId  String
+  externalId String
+  title      String
+  sku        String?
+  price      Decimal
+  stock      Int     @default(0)
+  imageId    String?
+
+  product Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  image   ProductImage? @relation(fields: [imageId], references: [id], onDelete: SetNull)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([productId, externalId])
+  @@map("product_variants")
+}
+
+model ProductImage {
+  id         String  @id @default(cuid())
+  productId  String
+  externalId String
+  src        String
+  alt        String?
+  position   Int     @default(0)
+
+  product  Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variants ProductVariant[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([productId, externalId])
+  @@index([productId, position])
+  @@map("product_images")
+}
+
 model Order {
-  id              String   @id @default(cuid())
-  integrationId   String
-  productId       String?
-  externalId      String
-  quantity        Int
-  revenue         Decimal
-  status          String   // pending, shipped, delivered, cancelled
+  id               String  @id @default(cuid())
+  integrationId    String
+  productId        String?
+  customerId       String?
+  externalId       String
+  name             String?
+  email            String?
+  quantity         Int
+  revenue          Decimal
+  status           String // pending, shipped, delivered, cancelled
+  financial_status String?
+  details          Json? // refunds, adjustments, raw payload extras
 
-  integration     Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
-  product         Product?    @relation(fields: [productId], references: [id], onDelete: SetNull)
+  integration Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  product     Product?    @relation(fields: [productId], references: [id], onDelete: SetNull)
+  customer    Customer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  line_items  LineItem[]
 
-  order_date      DateTime
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
+  order_date DateTime
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@unique([integrationId, externalId])
+  @@index([integrationId, status])
+  @@index([integrationId, order_date])
   @@map("orders")
 }
 
 model Analytics {
-  id              String   @id @default(cuid())
-  integrationId   String
-  date            DateTime @unique
+  id            String   @id @default(cuid())
+  integrationId String
+  date          DateTime @unique
 
   total_revenue   Decimal
   total_orders    Int
@@ -97,56 +159,153 @@ model Analytics {
   conversion_rate Decimal?
   avg_order_value Decimal?
 
-  created_at      DateTime @default(now())
+  created_at DateTime @default(now())
 
   @@map("analytics")
 }
 
 model Automation {
-  id              String   @id @default(cuid())
-  integrationId   String
-  userId          String
-  name            String
-  type            String   // price_adjustment, stock_alert, description_update
-  condition       Json
-  action          Json
-  enabled         Boolean  @default(true)
-  frequency       String   // daily, real-time, on_order
+  id            String  @id @default(cuid())
+  integrationId String
+  userId        String
+  name          String
+  type          String // price_adjustment, stock_alert, description_update
+  condition     Json
+  action        Json
+  enabled       Boolean @default(true)
+  frequency     String // daily, real-time, on_order
 
-  integration     Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
-  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  logs            AutomationLog[]
+  integration Integration     @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs        AutomationLog[]
 
-  last_run        DateTime?
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
+  last_run   DateTime?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
 
   @@map("automations")
 }
 
 model AutomationLog {
-  id              String   @id @default(cuid())
-  automationId    String
-  userId          String
-  status          String   // success, failed, skipped
-  affected_items  Int
-  details         Json?
+  id             String @id @default(cuid())
+  automationId   String
+  userId         String
+  status         String // success, failed, skipped
+  affected_items Int
+  details        Json?
 
-  automation      Automation @relation(fields: [automationId], references: [id], onDelete: Cascade)
-  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  automation Automation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  executed_at     DateTime @default(now())
+  executed_at DateTime @default(now())
 
   @@map("automation_logs")
 }
 
 model OAuthState {
-  id              String   @id @default(cuid())
-  state           String   @unique
-  store_url       String
-  user_id         String
-  expires_at      DateTime
-  created_at      DateTime @default(now())
+  id         String   @id @default(cuid())
+  state      String   @unique
+  store_url  String
+  user_id    String
+  expires_at DateTime
+  created_at DateTime @default(now())
 
   @@map("oauth_states")
+}
+
+model LineItem {
+  id          String  @id @default(cuid())
+  orderId     String
+  productId   String?
+  externalId  String?
+  variantId   String?
+  title       String?
+  sku         String?
+  quantity    Int
+  price       Decimal
+  subtotal    Decimal
+  productInfo Json? // snapshot when Product not found locally
+
+  order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([orderId, externalId])
+  @@index([productId])
+  @@map("line_items")
+}
+
+model Customer {
+  id            String  @id @default(cuid())
+  integrationId String
+  externalId    String
+  email         String?
+  first_name    String?
+  last_name     String?
+  name          String?
+  phone         String?
+  address       String?
+  city          String?
+  province      String?
+  country       String?
+  zip           String?
+  addresses     Json? // full address book snapshot
+
+  integration Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  orders      Order[]
+
+  last_seen  DateTime?
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+
+  @@unique([integrationId, externalId])
+  @@index([integrationId, email])
+  @@map("customers")
+}
+
+model Webhook {
+  id            String  @id @default(cuid())
+  integrationId String
+  topic         String
+  address       String
+  active        Boolean @default(true)
+
+  integration Integration  @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  logs        WebhookLog[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([integrationId, topic])
+  @@map("webhooks")
+}
+
+model WebhookLog {
+  id           String    @id @default(cuid())
+  webhookId    String
+  payload      Json
+  status       String
+  error        String?   @db.Text
+  delivered_at DateTime?
+
+  webhook Webhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+
+  @@map("webhook_logs")
+}
+
+model PriceHistory {
+  id         String   @id @default(cuid())
+  productId  String
+  oldPrice   Decimal
+  newPrice   Decimal
+  changedBy  String?
+  changed_at DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("price_history")
 }

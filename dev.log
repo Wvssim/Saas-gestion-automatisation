@@ -454,3 +454,28 @@
  ✓ Compiled /api/auth/[...nextauth] in 713ms (1124 modules)
  GET /api/auth/session 200 in 1412ms
  GET /api/auth/session 200 in 25ms
+ ✓ Compiled in 1499ms (1928 modules)
+ ✓ Compiled in 199ms (953 modules)
+ ✓ Compiled in 214ms (953 modules)
+ ✓ Compiled in 179ms (953 modules)
+ ✓ Compiled in 161ms (953 modules)
+ ✓ Compiled in 542ms (1928 modules)
+ ✓ Compiled in 218ms (953 modules)
+ ✓ Compiled in 460ms (1928 modules)
+ ✓ Compiled in 180ms (953 modules)
+ GET / 200 in 264ms
+ ✓ Compiled /api/auth/[...nextauth] in 438ms (1123 modules)
+ GET /api/auth/session 200 in 672ms
+ GET /api/auth/session 200 in 27ms
+ GET /auth/signin 500 in 248ms
+ GET /auth/signin 500 in 228ms
+ GET /auth/signin 500 in 236ms
+ GET /auth/signin 500 in 234ms
+ GET /auth/signin 500 in 222ms
+ GET /auth/signin 500 in 234ms
+ GET /auth/signin 500 in 237ms
+ GET /auth/signin 500 in 238ms
+ GET /auth/signin 200 in 156ms
+ GET /auth/signin 200 in 69ms
+ GET /api/auth/session 200 in 20ms
+ GET /api/auth/session 200 in 7ms

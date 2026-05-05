@@ -65,6 +65,8 @@ export async function POST(request: NextRequest) {
       id: integration.id,
       storeUrl: integration.storeUrl || '',
       apiKey: integration.apiKey,
+      refreshToken: integration.refreshToken || undefined,
+      accessTokenExpiresAt: integration.accessTokenExpiresAt,
       last_sync: integration.last_sync || undefined,
     });
 

@@ -1,5 +1,7 @@
 import { RateLimitError, AuthError, InternalError } from '@/lib/utils/errors';
 import { ShopifyProduct, ShopifyOrder, ShopifyLineItem } from './types';
+import { prisma } from '@/lib/db/client';
+import { SHOPIFY_CONFIG } from './config';
 
 interface RateLimitState {
   remaining: number;
@@ -7,29 +9,181 @@ interface RateLimitState {
   requestsThisInterval: number;
 }
 
+interface TokenRefreshResult {
+  accessToken: string;
+  refreshToken?: string;
+  accessTokenExpiresAt: Date;
+}
+
 export class ShopifyClient {
   private accessToken: string;
+  private refreshTokenValue?: string;
+  private accessTokenExpiresAt?: Date;
+  private integrationId?: string;
   private storeUrl: string;
   private apiVersion: string;
   private rateLimitState: RateLimitState = {
-    remaining: 40,
+    remaining: SHOPIFY_CONFIG.rateLimit.requestsPerSecond,
     reset: Date.now(),
     requestsThisInterval: 0,
   };
 
-  private readonly RATE_LIMIT_THRESHOLD = 0.1; // Attendre si < 10% capacity
-  private readonly REQUEST_TIMEOUT = 30000; // 30s
-  private readonly RETRY_ATTEMPTS = 3;
-  private readonly RETRY_DELAY = 1000; // ms
+  private readonly RATE_LIMIT_THRESHOLD = SHOPIFY_CONFIG.rateLimit.waitThreshold;
+  private readonly REQUEST_TIMEOUT = SHOPIFY_CONFIG.timeout.request;
+  private readonly RETRY_ATTEMPTS = SHOPIFY_CONFIG.timeout.retryAttempts;
+  private readonly RETRY_DELAY = SHOPIFY_CONFIG.timeout.retryDelay;
+  private readonly TOKEN_BUFFER_MS = SHOPIFY_CONFIG.sync.defaultHistoryDays * 24 * 60 * 60 * 1000; // Convert to ms
 
-  constructor(storeUrl: string, accessToken: string) {
+  constructor(
+    storeUrl: string,
+    accessToken: string,
+    options?: {
+      refreshToken?: string;
+      accessTokenExpiresAt?: Date | null;
+      integrationId?: string;
+    }
+  ) {
     if (!storeUrl || !accessToken) {
       throw new AuthError('Missing Shopify credentials');
     }
 
     this.storeUrl = storeUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
     this.accessToken = accessToken;
-    this.apiVersion = process.env.SHOPIFY_API_VERSION || '2024-01';
+    this.refreshTokenValue = options?.refreshToken;
+    this.accessTokenExpiresAt = options?.accessTokenExpiresAt
+      ? new Date(options.accessTokenExpiresAt)
+      : undefined;
+    this.integrationId = options?.integrationId;
+    this.apiVersion = SHOPIFY_CONFIG.apiVersion;
+  }
+
+  /**
+   * Vérifier si access token expiré (ou bientôt)
+   */
+  isTokenExpired(): boolean {
+    if (!this.accessTokenExpiresAt) {
+      return false;
+    }
+    return this.accessTokenExpiresAt.getTime() - this.TOKEN_BUFFER_MS < Date.now();
+  }
+
+  /**
+   * Échanger refresh token contre nouvel access token
+   * Persiste les nouveaux tokens en DB si integrationId connu
+   */
+  async refreshToken(refreshToken?: string): Promise<TokenRefreshResult> {
+    const tokenToUse = refreshToken || this.refreshTokenValue;
+    if (!tokenToUse) {
+      throw new AuthError('No refresh token available');
+    }
+
+    const apiKey = process.env.SHOPIFY_API_KEY;
+    const apiSecret = process.env.SHOPIFY_API_SECRET;
+    if (!apiKey || !apiSecret) {
+      throw new InternalError('Shopify credentials not configured');
+    }
+
+    const url = `https://${this.storeUrl}/admin/oauth/access_token`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.REQUEST_TIMEOUT);
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          client_id: apiKey,
+          client_secret: apiSecret,
+          grant_type: 'refresh_token',
+          refresh_token: tokenToUse,
+        }),
+        signal: controller.signal,
+      });
+
+      if (response.status === 401) {
+        throw new AuthError('Refresh token invalid or expired');
+      }
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => null);
+        throw new InternalError(
+          `Token refresh failed: ${error?.error_description || response.statusText}`
+        );
+      }
+
+      const data = await response.json();
+      const newAccessToken: string | undefined = data.access_token;
+      const newRefreshToken: string | undefined = data.refresh_token;
+      const expiresIn: number | undefined = data.expires_in;
+
+      if (!newAccessToken) {
+        throw new InternalError('No access token in refresh response');
+      }
+
+      const expiresAt = expiresIn
+        ? new Date(Date.now() + expiresIn * 1000 - this.TOKEN_BUFFER_MS)
+        : new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+      this.accessToken = newAccessToken;
+      if (newRefreshToken) this.refreshTokenValue = newRefreshToken;
+      this.accessTokenExpiresAt = expiresAt;
+
+      if (this.integrationId) {
+        try {
+          await prisma.integration.update({
+            where: { id: this.integrationId },
+            data: {
+              apiKey: newAccessToken,
+              refreshToken: newRefreshToken || this.refreshTokenValue,
+              accessTokenExpiresAt: expiresAt,
+              updated_at: new Date(),
+            },
+          });
+          console.log(
+            `[Shopify] Token refreshed for integration ${this.integrationId}`
+          );
+        } catch (err) {
+          console.error('[Shopify] Failed to persist refreshed token:', err);
+        }
+      }
+
+      return {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+        accessTokenExpiresAt: expiresAt,
+      };
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new InternalError('Shopify token refresh timeout');
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  /**
+   * Garantir token valide avant requête
+   */
+  private async ensureValidToken(): Promise<void> {
+    if (this.isTokenExpired() && this.refreshTokenValue) {
+      await this.refreshToken();
+    }
+  }
+
+  /**
+   * Getters publics pour token state
+   */
+  getAccessToken(): string {
+    return this.accessToken;
+  }
+
+  getRefreshToken(): string | undefined {
+    return this.refreshTokenValue;
+  }
+
+  getAccessTokenExpiresAt(): Date | undefined {
+    return this.accessTokenExpiresAt;
   }
 
   /**
@@ -50,16 +204,26 @@ export class ShopifyClient {
   }
 
   /**
-   * Récupère les commandes depuis une date
+   * Récupère les commandes depuis une date avec pagination cursor
    */
-  async getOrders(since?: Date): Promise<{ orders: ShopifyOrder[] }> {
-    const sinceDate = since?.toISOString() || null;
+  async getOrders(
+    since?: Date,
+    limit: number = 50,
+    cursor?: string
+  ): Promise<any> {
+    const queryFilter = since
+      ? `updated_at:>='${since.toISOString()}'`
+      : null;
 
     return this.requestWithRetry(
       () =>
         this.makeRequest('GET', '/graphql.json', {
           query: this.buildOrdersQuery(),
-          variables: { since: sinceDate },
+          variables: {
+            first: limit,
+            after: cursor,
+            query: queryFilter,
+          },
         }),
       'getOrders'
     );
@@ -109,6 +273,9 @@ export class ShopifyClient {
     path: string,
     body?: any
   ): Promise<any> {
+    // Refresh proactif si token expiré
+    await this.ensureValidToken();
+
     // Attendre si rate limit approche
     await this.checkRateLimit();
 
@@ -131,6 +298,32 @@ export class ShopifyClient {
       this.updateRateLimitFromResponse(response);
 
       if (response.status === 401) {
+        // Tentative de refresh réactif si possible
+        if (this.refreshTokenValue) {
+          try {
+            await this.refreshToken();
+            const retry = await fetch(url, {
+              method,
+              headers: {
+                'X-Shopify-Access-Token': this.accessToken,
+                'Content-Type': 'application/json',
+              },
+              body: body ? JSON.stringify(body) : undefined,
+            });
+            this.updateRateLimitFromResponse(retry);
+            if (retry.ok) {
+              const data = await retry.json();
+              if (data.errors && Array.isArray(data.errors)) {
+                throw new InternalError(
+                  `GraphQL error: ${data.errors.map((e: any) => e.message).join(', ')}`
+                );
+              }
+              return data;
+            }
+          } catch (refreshErr) {
+            console.error('[Shopify] Reactive token refresh failed:', refreshErr);
+          }
+        }
         throw new AuthError('Invalid Shopify access token');
       }
 
@@ -260,12 +453,28 @@ export class ShopifyClient {
               description
               vendor
               productType
-              variants(first: 1) {
+              status
+              updatedAt
+              variants(first: 100) {
                 edges {
                   node {
-                    price
+                    id
+                    title
                     sku
+                    price
                     inventoryQuantity
+                    image {
+                      id
+                    }
+                  }
+                }
+              }
+              images(first: 50) {
+                edges {
+                  node {
+                    id
+                    url
+                    altText
                   }
                 }
               }
@@ -281,30 +490,103 @@ export class ShopifyClient {
 
   private buildOrdersQuery(): string {
     return `
-      query GetOrders($since: DateTime) {
-        orders(first: 100, query: $since) {
+      query GetOrders($first: Int!, $after: String, $query: String) {
+        orders(first: $first, after: $after, query: $query, sortKey: UPDATED_AT) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
           edges {
+            cursor
             node {
               id
               name
-              totalPrice {
-                amount
-              }
-              fulfillmentStatus
+              email
+              displayFulfillmentStatus
+              displayFinancialStatus
+              cancelledAt
+              cancelReason
               createdAt
               updatedAt
+              processedAt
+              currentTotalPriceSet {
+                shopMoney {
+                  amount
+                  currencyCode
+                }
+              }
+              totalPriceSet {
+                shopMoney {
+                  amount
+                  currencyCode
+                }
+              }
+              totalRefundedSet {
+                shopMoney {
+                  amount
+                  currencyCode
+                }
+              }
+              refunds(first: 25) {
+                id
+                createdAt
+                note
+                totalRefundedSet {
+                  shopMoney {
+                    amount
+                    currencyCode
+                  }
+                }
+              }
+              customer {
+                id
+                email
+                firstName
+                lastName
+                phone
+                createdAt
+                updatedAt
+                defaultAddress {
+                  address1
+                  address2
+                  city
+                  province
+                  country
+                  zip
+                  phone
+                }
+                addresses {
+                  address1
+                  address2
+                  city
+                  province
+                  country
+                  zip
+                }
+              }
               lineItems(first: 100) {
                 edges {
                   node {
                     id
+                    title
+                    sku
+                    quantity
+                    variant {
+                      id
+                    }
                     product {
                       id
                     }
-                    quantity
-                    originalUnitPrice {
-                      amount
+                    originalUnitPriceSet {
+                      shopMoney {
+                        amount
+                      }
                     }
-                    sku
+                    discountedTotalSet {
+                      shopMoney {
+                        amount
+                      }
+                    }
                   }
                 }
               }

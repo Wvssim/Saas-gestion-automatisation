@@ -11,7 +11,7 @@ export function LandingNav() {
         transition={{ type: "spring", stiffness: 400, damping: 10 }}
       >
         <motion.svg
-          fill="currentColor"
+          fill="none"
           viewBox="0 0 100 100"
           xmlns="http://www.w3.org/2000/svg"
           aria-hidden="true"
@@ -29,12 +29,24 @@ export function LandingNav() {
           }}
         >
           <motion.path
-            d="M15 85V15h12l18 35 18-35h12v70h-12V35L45 70h-10L17 35v50H15z"
-            initial={{ pathLength: 1 }}
-            whileHover={{
-              pathLength: [1, 0, 1],
-              transition: { duration: 1.2, ease: "easeInOut" },
-            }}
+            d="M 40 25 C 20 25 20 45 40 45 C 60 45 60 65 40 65"
+            stroke="currentColor"
+            strokeWidth="8"
+            fill="none"
+            strokeLinecap="round"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 1, delay: 0.2 }}
+          />
+          <motion.path
+            d="M 60 25 L 60 85 M 60 25 L 80 25 M 60 55 L 75 55"
+            stroke="currentColor"
+            strokeWidth="8"
+            fill="none"
+            strokeLinecap="round"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 1, delay: 0.4 }}
           />
         </motion.svg>
 

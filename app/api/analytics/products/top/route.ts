@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { z } from 'zod';
-import { prisma } from '@/lib/db/client';
-import { authOptions } from '@/lib/auth/config';
-import { topProductsQuerySchema } from '@/lib/analytics/schemas';
-import type { ApiResponse } from '@/types';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { z } from "zod";
+import { prisma } from "@/lib/db/client";
+import { authOptions } from "@/lib/auth/config";
+import { topProductsQuerySchema } from "@/lib/analytics/schemas";
+import type { ApiResponse } from "@/types";
+import { TopProduct } from "@/types/dashboard";
 
 interface TopProduct {
   id: string;
@@ -13,6 +14,10 @@ interface TopProduct {
   totalRevenue: number;
   orderCount: number;
   avgPrice: number;
+  revenue: number;
+  orders: number;
+  stock: number;
+  image: string;
 }
 
 /**
@@ -20,31 +25,35 @@ interface TopProduct {
  * Query: ?limit=10
  * Returns: Top products par revenue avec pagination
  */
-export async function GET(req: NextRequest): Promise<NextResponse<ApiResponse<TopProduct[]>>> {
+export async function GET(
+  req: NextRequest,
+): Promise<NextResponse<ApiResponse<TopProduct[]>>> {
   try {
-    const session = await getServerSession(authOptions) as any;
+    const session = (await getServerSession(authOptions)) as any;
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
       );
     }
 
     // Parse query params
     const searchParams = req.nextUrl.searchParams;
-    const limitStr = searchParams.get('limit') || '10';
+    const limitStr = searchParams.get("limit") || "10";
 
     // Validate
     let limit = 10;
     try {
-      const validated = topProductsQuerySchema.parse({ limit: parseInt(limitStr) });
+      const validated = topProductsQuerySchema.parse({
+        limit: parseInt(limitStr),
+      });
       limit = validated.limit;
     } catch (error) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(
-          { success: false, error: 'Invalid limit parameter' },
-          { status: 400 }
+          { success: false, error: "Invalid limit parameter" },
+          { status: 400 },
         );
       }
       throw error;
@@ -63,9 +72,10 @@ export async function GET(req: NextRequest): Promise<NextResponse<ApiResponse<To
         { success: true, data: [] },
         {
           headers: {
-            'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=1200',
+            "Cache-Control":
+              "public, s-maxage=600, stale-while-revalidate=1200",
           },
-        }
+        },
       );
     }
 
@@ -91,7 +101,7 @@ export async function GET(req: NextRequest): Promise<NextResponse<ApiResponse<To
         COALESCE(AVG(CAST(o.revenue AS DECIMAL)), 0) as avg_price
       FROM products p
       LEFT JOIN orders o ON p.id = o."productId"
-      WHERE p."integrationId" = ANY(ARRAY[${integrationIds.join(',')}]::text[])
+      WHERE p."integrationId" = ANY(ARRAY[${integrationIds.join(",")}]::text[])
       GROUP BY p.id, p.name, p.sku
       ORDER BY total_revenue DESC
       LIMIT ${limit}
@@ -104,22 +114,78 @@ export async function GET(req: NextRequest): Promise<NextResponse<ApiResponse<To
       totalRevenue: Number(product.total_revenue || 0),
       orderCount: Number(product.order_count || 0),
       avgPrice: Number((product.avg_price || 0).toFixed(2)),
+      revenue: Number(product.total_revenue || 0),
+      orders: Number(product.order_count || 0),
+      stock: Number(product.stock || 0),
+      image: product.image || "/images/product-placeholder.jpg",
     }));
 
     return NextResponse.json(
       { success: true, data },
       {
         headers: {
-          'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=1200',
+          "Cache-Control": "public, s-maxage=600, stale-while-revalidate=1200",
         },
-      }
+      },
     );
   } catch (error) {
-    console.error('[Analytics Top Products] Error:', error);
+    console.error("[Analytics Top Products] Error:", error);
 
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
-      { status: 500 }
+      { success: false, error: "Internal server error" },
+      { status: 500 },
     );
   }
 }
+
+const getTopProducts = async (): Promise<TopProduct[]> => {
+  // In a real app, this would fetch and calculate data from a database
+  // For now, we return mock data that matches the expected structure
+  return [
+    {
+      id: "1",
+      name: "Premium Wireless Headphones",
+      revenue: 12450,
+      orders: 156,
+      stock: 45,
+      image: "/images/product-1.jpg",
+    },
+    {
+      id: "2",
+      name: "Smart Fitness Tracker",
+      revenue: 8230,
+      orders: 412,
+      stock: 128,
+      image: "/images/product-2.jpg",
+    },
+    {
+      id: "3",
+      name: "Organic Green Tea",
+      revenue: 6540,
+      orders: 820,
+      stock: 210,
+      image: "/images/product-3.jpg",
+    },
+    {
+      id: "4",
+      name: "Classic Leather Wallet",
+      revenue: 4320,
+      orders: 210,
+      stock: 8,
+      image: "/images/product-4.jpg",
+    },
+    {
+      id: "5",
+      name: "Bluetooth Speaker",
+      revenue: 3100,
+      orders: 150,
+      stock: 22,
+      image: "/images/product-5.jpg",
+    },
+  ];
+};
+
+export const GET = apiHandler(async () => {
+  const products = await getTopProducts();
+  return NextResponse.json({ data: products });
+});
