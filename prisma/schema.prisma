@@ -34,12 +34,13 @@ model Integration {
   storeUrl             String?
   enabled              Boolean   @default(true)
 
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  products    Product[]
-  orders      Order[]
-  automations Automation[]
-  customers   Customer[]
-  webhooks    Webhook[]
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products              Product[]
+  orders                Order[]
+  automations           Automation[]
+  customers             Customer[]
+  webhooks              Webhook[]
+  webhook_subscriptions WebhookSubscription[]
 
   last_sync  DateTime?
   created_at DateTime  @default(now())
@@ -308,4 +309,23 @@ model PriceHistory {
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@map("price_history")
+}
+
+model WebhookSubscription {
+  id                String  @id @default(cuid())
+  integrationId     String
+  integration       Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  shopifyWebhookId  String  // ID from Shopify API
+  topic             String  // PRODUCTS_UPDATE, ORDERS_CREATE, ORDERS_UPDATED, INVENTORY_LEVELS_UPDATE
+  endpoint          String  // Our webhook URL
+  active            Boolean @default(true)
+  lastTriggeredAt   DateTime?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([integrationId, topic])
+  @@index([integrationId])
+  @@map("webhook_subscriptions")
 }
